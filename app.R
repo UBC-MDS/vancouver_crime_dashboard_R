@@ -128,9 +128,14 @@ filter_panel = list(
 # plots layout
 plot_body = list(
     dbcRow(list(
-        dbcCol(dccGraph("bar_plot")),
-        dbcCol(dccGraph("line_plot"))
+        dbcCol(dccGraph("bar_plot"))
     )
+    ),
+    htmlBr(),
+    htmlBr(),
+    htmlBr(),
+    dbcRow(
+        dbcCol(dccGraph("line_plot"))
     )
 )
 
@@ -170,17 +175,18 @@ app$callback(
             filter(Neighborhood == neighbourhood, YEAR == year) %>%
             add_count(Type)
         bar_chart <-  bar_data %>%
-            ggplot(aes(x = reorder(Type, -n), fill = Type)) +
+            ggplot(aes(y = reorder(Type, -n), fill = Type)) +
             geom_bar() + 
-            labs(title = "Crimes by Type", x = "Type of Crime", y = "Number of Crimes") +
+            labs(title = "Crimes by Type", x = "Number of Crimes", y = "Type of Crime") +
             theme(
-                plot.title = element_text(face = "bold", size = 16),
+                plot.title = element_text(face = "bold", size = 14),
                 axis.title = element_text(face = "bold", size = 12),
-                axis.text.x=element_blank()
+                axis.text.x = element_blank(),
+                legend.position = 'none'
             ) +
             scale_fill_brewer(palette="YlOrRd")
         
-        ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 800, height = 500)
+        ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 600, height = 300)
     }
 )
 
@@ -208,11 +214,12 @@ app$callback(
             labs(title = "Crimes over time", x = "Year", y = "Number of Crimes") +
             theme(
                 plot.title = element_text(face = "bold", size = 14),
-                axis.title = element_text(face = "bold", size = 10)
+                axis.title = element_text(face = "bold", size = 12),
+                axis.line = element_line(colour = "black"),
+                panel.background = element_blank()
             ) +
-            theme_bw() +
             scale_color_manual(values = c("red", "orange"))
-        ggplotly(line_chart, width = 800, height = 500)
+        ggplotly(line_chart, width = 1200, height = 500)
     }
 )
 
