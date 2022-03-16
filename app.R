@@ -8,6 +8,7 @@ library(plotly)
 library(ggthemes)
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app$title("Vancouver Crime Dashboard")
 
 data <- read_csv('data/processed_df.csv')
 
