@@ -8,6 +8,7 @@ library(plotly)
 library(ggthemes)
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app$title("Vancouver Crime Dashboard")
 
 data <- read_csv('data/processed_df.csv')
 
@@ -112,13 +113,14 @@ card3 <- dbcCard(
 # filter layout
 filter_panel = list(
     htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
-    dbcCollapse(htmlP("The filter panel below helps you filter the crimes. 
-                      The neighborhood can accept multiple options and updates 
-                      the bar chart and the line graph. The year will update the 
-                      bar chart and the map so they show the crimes for the year specified.
-                      The time which has three options will aggregate the line gragh 
-                      by time of the day. The card represents the number of crimes 
-                      for the specified year and neighbourhood.",
+    dbcCollapse(htmlP("The filter panel below helps you filter the plots. 
+                      The neighborhood filter can accept multiple options and 
+                      updates the bar chart and the line graph. The year filter will 
+                      update the bar chart and the map so they show the crimes for 
+                      the year specified. The time filter which has three options 
+                      will aggregate the line graph by time of the day. The summary card 
+                      represents the number of crimes for the specified year and 
+                      neighbourhood.",
                       style = list("marginLeft" = 20)),
                 id = "collapse", is_open = FALSE),
     dbcRow(collapse, style = list("marginLeft" = 120)),
@@ -189,6 +191,8 @@ app$callback(
                 plot.title = element_text(face = "bold", size = 14),
                 axis.title = element_text(face = "bold", size = 12),
                 axis.text.y = element_blank(),
+                axis.ticks.y = element_blank(),
+                panel.background = element_blank(),
                 legend.position = 'none'
             ) +
             scale_fill_brewer(palette="YlOrRd")
@@ -245,4 +249,3 @@ app$callback(
 )
 
 app$run_server(host = '0.0.0.0')
-# app$run_server(debug = T)
