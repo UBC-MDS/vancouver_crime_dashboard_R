@@ -6,6 +6,8 @@ library(dplyr)
 library(purrr)
 library(plotly)
 library(ggthemes)
+library(geojsonio)
+library(leaflet)
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 app$title("Vancouver Crime Dashboard")
@@ -74,6 +76,8 @@ card2 <- dbcCard(
         dccRadioItems(id = "year_radio",
                       options = opt_radio_year, 
                       value = 2021,
+                      persistence=TRUE,
+                      persistence_type='session',
                       className="radiobutton",
                       labelStyle = list("display" = "in-block", "marginLeft" = 20)),
         htmlBr(),
@@ -136,7 +140,8 @@ filter_panel = list(
 # plots layout
 plot_body = list(
     dbcRow(list(
-        dbcCol(dccGraph("bar_plot"))
+        dbcCol(dccGraph("bar_plot")),
+        dbcCol(htmlDiv(list(htmlIframe(id = "map", style = list(width = 500, height = 300)))))
     )
     ),
     htmlBr(),
@@ -235,6 +240,50 @@ app$callback(
 )
 
 app$callback(
+    output('map', 'srcDoc'),
+    list(input('year_radio', 'value')),
+    function(yyyy) {
+        file = switch(as.character(yyyy),
+                      '2021' = "data/map2021.geojson",
+                      '2020' = "data/map2020.geojson",
+                      '2019' = "data/map2019.geojson",
+                      '2018' = "data/map2018.geojson",
+                      '2017' = "data/map2017.geojson")
+        vancity <- geojsonio::geojson_read(file, what = "sp")
+        m1 <- leaflet(vancity) %>%
+            addProviderTiles("MapBox", options = providerTileOptions(
+                id = "mapbox.light",
+                accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')))
+        bins <- c(0, 500, 1000, 1500, 2000, 2500, 3000, 3500, Inf)
+        pal <- colorBin("YlOrRd", domain = vancity$year, bins = bins)
+        labels <- sprintf(
+            "<strong>%s</strong><br/>%g Crimes",
+            vancity$name, vancity$year
+        ) %>% lapply(htmltools::HTML)
+        m2 <- m1 %>% addPolygons(
+            fillColor = ~pal(year),
+            weight = 2,
+            opacity = 1,
+            color = "white",
+            dashArray = "1",
+            fillOpacity = 0.7,
+            highlightOptions = highlightOptions(
+                weight = 5,
+                color = "#666",
+                dashArray = "",
+                fillOpacity = 0.7,
+                bringToFront = TRUE),
+            label = labels,
+            labelOptions = labelOptions(
+                style = list("font-weight" = "normal", padding = "3px 8px"),
+                textsize = "15px",
+                direction = "auto"))
+        saveWidget(m2, file="m.html")
+        htmltools::includeHTML("m.html")
+    }
+)
+
+app$callback(
     output("collapse", "is_open"),
     list(
         input("collapse-button", "n_clicks"),
@@ -249,3 +298,6 @@ app$callback(
 )
 
 app$run_server(host = '0.0.0.0')
+# app$run_server(debug=T)
+
+
