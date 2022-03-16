@@ -112,7 +112,13 @@ card3 <- dbcCard(
 # filter layout
 filter_panel = list(
     htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
-    dbcCollapse(htmlP("The filter panel below helps you filter the crimes. The neighborhood can accept multiple options and updates the bar chart and the line graph. The year will update the bar chart and the map so they show the crimes for the year specified. The time which has three options will aggregate the line gragh by time of the day. The card represents the number of crimes for the specified year and neighbourhood.",
+    dbcCollapse(htmlP("The filter panel below helps you filter the crimes. 
+                      The neighborhood can accept multiple options and updates 
+                      the bar chart and the line graph. The year will update the 
+                      bar chart and the map so they show the crimes for the year specified.
+                      The time which has three options will aggregate the line gragh 
+                      by time of the day. The card represents the number of crimes 
+                      for the specified year and neighbourhood.",
                       style = list("marginLeft" = 20)),
                 id = "collapse", is_open = FALSE),
     dbcRow(collapse, style = list("marginLeft" = 120)),
@@ -131,6 +137,7 @@ plot_body = list(
         dbcCol(dccGraph("bar_plot"))
     )
     ),
+    htmlBr(),
     htmlBr(),
     htmlBr(),
     htmlBr(),
@@ -181,12 +188,12 @@ app$callback(
             theme(
                 plot.title = element_text(face = "bold", size = 14),
                 axis.title = element_text(face = "bold", size = 12),
-                axis.text.x = element_blank(),
+                axis.text.y = element_blank(),
                 legend.position = 'none'
             ) +
             scale_fill_brewer(palette="YlOrRd")
         
-        ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 600, height = 300)
+        ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 500, height = 300)
     }
 )
 
@@ -219,7 +226,7 @@ app$callback(
                 panel.background = element_blank()
             ) +
             scale_color_manual(values = c("red", "orange"))
-        ggplotly(line_chart, width = 1200, height = 500)
+        ggplotly(line_chart, tooltip = "count", width = 1200, height = 400)
     }
 )
 
