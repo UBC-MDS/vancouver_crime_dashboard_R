@@ -1,4 +1,5 @@
 # Vancouver Crime Dashboard
+Link to the dashboard: [Vancouver Crime Dashboard](https://vancouver-crime-dashboard-r.herokuapp.com/)
 
 ## Description of the dashboard
 
