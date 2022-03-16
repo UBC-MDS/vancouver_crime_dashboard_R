@@ -26,6 +26,26 @@ opt_dropdown_time = list(
     list("label" = "Night", "value" = "Night"),
     list("label" = "Day and Night", "value"= "Day and Night")
 )
+
+# Collapse button
+collapse <- htmlDiv(
+    list(
+        dbcButton(
+            "Learn more",
+            id = "collapse-button",
+            className = "mb-3",
+            n_clicks = 0,
+            outline = FALSE,
+            style = list(
+                "margin-top" = "10px",
+                "width" = "150px",
+                "background-color" = "#E33B18",
+                "color" = "white"
+            )
+        )
+    )
+)
+
 # summary card
 card1 <- dbcCard(
     list(
@@ -48,8 +68,6 @@ card2 <- dbcCard(
                     className="dropdown",
                     multi = TRUE),
         htmlBr(),
-        htmlBr(),
-        htmlBr(),
         # Radio button for year
         htmlH5("Year", className="text-dark"),
         dccRadioItems(id = "year_radio",
@@ -58,9 +76,8 @@ card2 <- dbcCard(
                       className="radiobutton",
                       labelStyle = list("display" = "in-block", "marginLeft" = 20)),
         htmlBr(),
-        htmlBr(),
-        htmlBr(),
         # Dropdown for time
+        htmlH5("Time", className="text-dark"),
         dccDropdown(id = "time-input",
                     options = opt_dropdown_time,
                     value = "Day and Night",
@@ -71,17 +88,41 @@ card2 <- dbcCard(
     color = "light"
 )
 
+# information card
+card3 <- dbcCard(
+    list(
+        htmlH5("Information", className="text-dark"),
+        htmlP(
+            list(
+                "Data used in this dashboard is sourced from ",
+                dccLink(
+                    "Vancouver Police Department",
+                    href = "https://geodash.vpd.ca/opendata/",
+                    target = "_blank"
+                ),
+                " (It has been filtered to only include incidents with location data from 2017 to 2021.)"
+            )
+        )
+    ),
+    style = list("width" = "25rem", "marginLeft" = 20),
+    body = TRUE,
+    color = "light",
+)
+
 # filter layout
 filter_panel = list(
     htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
-    htmlBr(),
+    dbcCollapse(htmlP("The filter panel below helps you filter the crimes. The neighborhood can accept multiple options and updates the bar chart and the line graph. The year will update the bar chart and the map so they show the crimes for the year specified. The time which has three options will aggregate the line gragh by time of the day. The card represents the number of crimes for the specified year and neighbourhood.",
+                      style = list("marginLeft" = 20)),
+                id = "collapse", is_open = FALSE),
+    dbcRow(collapse, style = list("marginLeft" = 120)),
     htmlBr(),
     card1,
     htmlBr(),
-    htmlBr(),
     htmlH4("Filters", style = list("marginLeft" = 20)),
     card2,
-    htmlBr()
+    htmlBr(),
+    card3
 )
 
 # plots layout
@@ -172,6 +213,20 @@ app$callback(
             theme_bw() +
             scale_color_manual(values = c("red", "orange"))
         ggplotly(line_chart, width = 800, height = 500)
+    }
+)
+
+app$callback(
+    output("collapse", "is_open"),
+    list(
+        input("collapse-button", "n_clicks"),
+        state("collapse", "is_open")
+    ),
+    function(n, is_open) {
+        if (n > 0) {
+            return(!is_open)
+        }
+        return(is_open)
     }
 )
 
