@@ -9,6 +9,6 @@ options(repos=r)
 # ======================================================================
 
 # packages go here
-install.packages(c('geojsonsf', 'dash', 'plotly', 'dashHtmlComponents', 'htmlwidgets', 'readr', 'dplyr', 'here', 'ggplot2', 'leaflet', 'purrr', 'remotes', 'ggthemes'))
+install.packages(c('geojsonsf', 'dash', 'plotly', 'dashHtmlComponents', 'htmlwidgets', 'readr', 'dplyr', 'here', 'ggplot2', 'purrr', 'remotes', 'ggthemes'))
 remotes::install_github('facultyai/dash-bootstrap-components@r-release')
 remotes::install_github("rstudio/leaflet")
