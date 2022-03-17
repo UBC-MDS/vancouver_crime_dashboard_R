@@ -8,6 +8,7 @@ library(plotly)
 library(ggthemes)
 library(geojsonio)
 library(leaflet)
+library(htmlwidgets)
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 app$title("Vancouver Crime Dashboard")
