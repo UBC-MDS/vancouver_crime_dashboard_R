@@ -8,9 +8,9 @@ library(plotly)
 library(ggthemes)
 library(ggplot2)
 library(geojsonio)
-# library(geojsonsf)
-# library(rjson)
-library(leaflet)
+library(geojsonsf)
+library(rjson)
+#library(leaflet)
 library(htmlwidgets)
 library(htmltools)
 
@@ -146,8 +146,7 @@ filter_panel = list(
 plot_body = list(
     dashBootstrapComponents::dbcRow(list(
         dashBootstrapComponents::dbcCol(dash::dccGraph("bar_plot")),
-        dashBootstrapComponents::dbcCol(dashHtmlComponents::htmlDiv(list(dashHtmlComponents::htmlIframe(id = "map", style = list(width = 500, height = 300)))))
-    )
+        dashBootstrapComponents::dbcCol(dash::dccGraph("map")))
     ),
     dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlBr(),
@@ -245,46 +244,29 @@ app$callback(
 )
 
 app$callback(
-    dash::output('map', 'srcDoc'),
+    dash::output('map', 'figure'),
     list(dash::input('year_radio', 'value')),
-    function(yyyy) {
-        file = switch(as.character(yyyy),
-                      '2021' = "data/map2021.geojson",
-                      '2020' = "data/map2020.geojson",
-                      '2019' = "data/map2019.geojson",
-                      '2018' = "data/map2018.geojson",
-                      '2017' = "data/map2017.geojson")
-        vancity <- geojsonio::geojson_read(file, what = "sp")
-        m1 <- leaflet::leaflet(vancity) %>%
-            leaflet::addProviderTiles("MapBox", options = leaflet::providerTileOptions(
-                id = "mapbox.light",
-                accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')))
-        bins <- c(0, 500, 1000, 1500, 2000, 2500, 3000, 3500, Inf)
-        pal <- leaflet::colorBin("YlOrRd", domain = vancity$year, bins = bins)
-        labels <- sprintf(
-            "<strong>%s</strong><br/>%g Crimes",
-            vancity$name, vancity$year
-        ) %>% lapply(htmltools::HTML)
-        m2 <- m1 %>% leaflet::addPolygons(
-            fillColor = ~pal(year),
-            weight = 2,
-            opacity = 1,
-            color = "white",
-            dashArray = "1",
-            fillOpacity = 0.7,
-            highlightOptions = leaflet::highlightOptions(
-                weight = 5,
-                color = "#666",
-                dashArray = "",
-                fillOpacity = 0.7,
-                bringToFront = TRUE),
-            label = labels,
-            labelOptions = leaflet::labelOptions(
-                style = list("font-weight" = "normal", padding = "3px 8px"),
-                textsize = "15px",
-                direction = "auto"))
-        htmlwidgets::saveWidget(m2, file="m.html")
-        htmltools::includeHTML("m.html")
+    function(year) {
+        df <- read.csv("data/map_df.csv") %>% 
+            dplyr::filter(YEAR==year) 
+        url_geojson <- "https://raw.githubusercontent.com/UBC-MDS/vancouver_crime_dashboard/main/data/vancouver.geojson"
+        geojson <- rgdal::readOGR(url_geojson)
+        geojson2 <- broom::tidy(geojson, region = "name")
+        geojson2 <- geojson2 %>%
+             dplyr::left_join(df, by = c("id" = "Neighborhood"))
+
+        p <- ggplot2::ggplot() +
+        ggplot2::labs(title = "Crimes over time", x = "Year", y = "Number of Crimes") +
+        ggplot2::geom_polygon(data = geojson2, 
+        aes(x = long, y = lat, group = group, fill = Count)) +
+        theme(
+            plot.title = element_text(face = "bold", size = 14),
+            axis.title = element_text(face = "bold", size = 12),
+            axis.line = element_line(colour = "black"),
+            panel.background = element_blank()) +
+        scale_fill_gradient(low = "yellow2", high = "red3", na.value = NA)
+
+        ggplotly(p)
     }
 )
 
