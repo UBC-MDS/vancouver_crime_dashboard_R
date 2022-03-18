@@ -41,7 +41,7 @@ collapse <- dashHtmlComponents::htmlDiv(
             outline = FALSE,
             style = list(
                 "margin-top" = "10px",
-                "width" = "150px",
+                "width" = "110px",
                 "background-color" = "#E33B18",
                 "color" = "white"
             )
@@ -52,10 +52,10 @@ collapse <- dashHtmlComponents::htmlDiv(
 # summary card
 card1 <- dashBootstrapComponents::dbcCard(
     list(
-        dashHtmlComponents::htmlH4("Total Number of Crimes", className = "card-title", style = list("marginLeft" = 50)),
-        dashHtmlComponents::htmlDiv(id = "summary", style = list("color" = "#E33B18", "fontSize" = 25, "marginLeft" = 140))
+        dashHtmlComponents::htmlH4("Total Number of Crimes", className = "card-title", style = list("marginLeft" = 20)),
+        dashHtmlComponents::htmlDiv(id = "summary", style = list("color" = "#E33B18", "fontSize" = 25, "marginLeft" = 100))
     ),
-    style = list("width" = "25rem", "marginLeft" = 20),
+    style = list("width" = "20rem", "marginLeft" = 20),
     body = TRUE,
     color = "light"
 )
@@ -79,7 +79,7 @@ card2 <- dashBootstrapComponents::dbcCard(
                       persistence=TRUE,
                       persistence_type='session',
                       className="radiobutton",
-                      labelStyle = list("display" = "in-block", "marginLeft" = 20)),
+                      labelStyle = list("display" = "in-block", "marginLeft" = 6)),
         dashHtmlComponents::htmlBr(),
         # Dropdown for time
         dashHtmlComponents::htmlH5("Time", className="text-dark"),
@@ -88,7 +88,7 @@ card2 <- dashBootstrapComponents::dbcCard(
                     value = "Day and Night",
                     className = "dropdown")
     ),
-    style = list("width" = "25rem", "marginLeft" = 20),
+    style = list("width" = "20rem", "marginLeft" = 20),
     body = TRUE,
     color = "light"
 )
@@ -109,7 +109,7 @@ card3 <- dashBootstrapComponents::dbcCard(
             )
         )
     ),
-    style = list("width" = "25rem", "marginLeft" = 20),
+    style = list("width" = "20rem", "marginLeft" = 20),
     body = TRUE,
     color = "light",
 )
@@ -184,7 +184,8 @@ app$callback(
     dash::output("bar_plot", "figure"),
     list(dash::input("neighbourhood_input", "value"),
          dash::input("year_radio", "value")),
-    function(neighbourhood, year){
+   
+     function(neighbourhood, year){
         bar_data <- data %>%
             dplyr::filter(Neighborhood %in% neighbourhood, YEAR == year) %>%
             dplyr::add_count(Type)
@@ -202,7 +203,7 @@ app$callback(
             ) +
             scale_fill_brewer(palette="YlOrRd")
         
-        plotly::ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), height = 350)
+        plotly::ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), height = 350, width = 450)
     }
 )
 
@@ -210,7 +211,8 @@ app$callback(
     dash::output("line_plot", 'figure'),
     list(dash::input("neighbourhood_input", "value"),
          dash::input("time-input", "value")),
-    function(neighbourhood, time){
+   
+     function(neighbourhood, time){
         line_data <- data
         line_data <- line_data %>%
             dplyr::filter(Neighborhood %in% neighbourhood)
@@ -235,7 +237,7 @@ app$callback(
                 panel.background = element_blank()
             ) +
             scale_color_manual(values = c("red", "orange"))
-        plotly::ggplotly(line_chart, tooltip = "count",  height = 400)
+        plotly::ggplotly(line_chart, tooltip = "count",  height = 400, width = 1000)
     }
 )
 
@@ -262,7 +264,7 @@ app$callback(
             panel.background = element_blank()) +
         scale_fill_gradient(low = "yellow2", high = "red3", na.value = NA)
 
-        ggplotly(p, height = 350)
+        ggplotly(p, height = 350, width = 450)
     }
 )
 
