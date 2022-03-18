@@ -180,7 +180,7 @@ app$callback(
          dash::input("year_radio", "value")),
     function(neighbourhood, year) {
         data_summary <- data %>%
-            filter(Neighborhood == neighbourhood, YEAR == year)
+            dplyr::filter(Neighborhood == neighbourhood, YEAR == year)
         nrow(data_summary)
     }
 )
@@ -191,7 +191,7 @@ app$callback(
          dash::input("year_radio", "value")),
     function(neighbourhood, year){
         bar_data <- data %>%
-            filter(Neighborhood == neighbourhood, YEAR == year) %>%
+            dplyr::filter(Neighborhood == neighbourhood, YEAR == year) %>%
             dplyr::add_count(Type)
         bar_chart <-  bar_data %>%
             ggplot2::ggplot(aes(y = reorder(Type, -n), fill = Type)) +
@@ -218,15 +218,15 @@ app$callback(
     function(neighbourhood, time){
         line_data <- data
         line_data <- line_data %>%
-            filter(Neighborhood %in% neighbourhood)
+            dplyr::filter(Neighborhood %in% neighbourhood)
         
         if (time == "Day"){
             line_data <- line_data %>%
-                filter(TIME == "day")
+                dplyr::filter(TIME == "day")
         }
         if (time == "Night"){
             line_data <- line_data %>%
-                filter(TIME == "night")
+                dplyr::filter(TIME == "night")
         }
         
         line_chart <-  line_data %>%
