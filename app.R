@@ -7,12 +7,8 @@ library(purrr)
 library(plotly)
 library(ggthemes)
 library(ggplot2)
-# library(geojsonio)
-# library(geojsonsf)
-# library(rjson)
-#library(leaflet)
-# library(htmlwidgets)
-# library(htmltools)
+library(htmlwidgets)
+library(htmltools)
 library(rgdal)
 
 app <- Dash$new(external_stylesheets = dashBootstrapComponents::dbcThemes$BOOTSTRAP)
@@ -257,7 +253,7 @@ app$callback(
              dplyr::left_join(df, by = c("id" = "Neighborhood"))
 
         p <- ggplot2::ggplot() +
-        ggplot2::labs(title = "Crimes over time", x = "Year", y = "Number of Crimes") +
+        ggplot2::labs(title = "Crimes by Neighborhooud", x = "Longitude", y = "Latitude") +
         ggplot2::geom_polygon(data = geojson2, 
         aes(x = long, y = lat, group = group, fill = Count)) +
         theme(
