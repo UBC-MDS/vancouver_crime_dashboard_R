@@ -7,12 +7,8 @@ library(purrr)
 library(plotly)
 library(ggthemes)
 library(ggplot2)
-# library(geojsonio)
-# library(geojsonsf)
-# library(rjson)
-#library(leaflet)
-# library(htmlwidgets)
-# library(htmltools)
+library(htmlwidgets)
+library(htmltools)
 library(rgdal)
 
 app <- Dash$new(external_stylesheets = dashBootstrapComponents::dbcThemes$BOOTSTRAP)
@@ -122,6 +118,7 @@ card3 <- dashBootstrapComponents::dbcCard(
 
 # filter layout
 filter_panel = list(
+    dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
     dashBootstrapComponents::dbcCollapse(dashHtmlComponents::htmlP("The filter panel below helps you filter the plots. 
                       The neighborhood filter can accept multiple options and 
@@ -145,11 +142,11 @@ filter_panel = list(
 
 # plots layout
 plot_body = list(
+    dashHtmlComponents::htmlBr(),
     dashBootstrapComponents::dbcRow(list(
         dashBootstrapComponents::dbcCol(dash::dccGraph("bar_plot")),
         dashBootstrapComponents::dbcCol(dash::dccGraph("map")))
     ),
-    dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlBr(),
@@ -207,7 +204,7 @@ app$callback(
             ) +
             scale_fill_brewer(palette="YlOrRd")
         
-        plotly::ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 500, height = 300)
+        plotly::ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), height = 350)
     }
 )
 
@@ -240,7 +237,7 @@ app$callback(
                 panel.background = element_blank()
             ) +
             scale_color_manual(values = c("red", "orange"))
-        plotly::ggplotly(line_chart, tooltip = "count", width = 1200, height = 400)
+        plotly::ggplotly(line_chart, tooltip = "count",  height = 400)
     }
 )
 
@@ -257,7 +254,7 @@ app$callback(
              dplyr::left_join(df, by = c("id" = "Neighborhood"))
 
         p <- ggplot2::ggplot() +
-        ggplot2::labs(title = "Crimes over time", x = "Year", y = "Number of Crimes") +
+        ggplot2::labs(title = "Crimes by Neighborhooud", x = "Longitude", y = "Latitude") +
         ggplot2::geom_polygon(data = geojson2, 
         aes(x = long, y = lat, group = group, fill = Count)) +
         theme(
@@ -267,7 +264,7 @@ app$callback(
             panel.background = element_blank()) +
         scale_fill_gradient(low = "yellow2", high = "red3", na.value = NA)
 
-        ggplotly(p)
+        ggplotly(p, height = 350)
     }
 )
 
