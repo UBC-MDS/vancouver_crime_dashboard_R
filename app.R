@@ -5,20 +5,22 @@ library(readr)
 library(dplyr)
 library(purrr)
 library(plotly)
-library(ggthemes)
-# library(geojsonio)
-library(geojsonsf)
+# library(ggthemes)
+library(ggplot2)
+library(geojsonio)
+# library(geojsonsf)
 # library(rjson)
 library(leaflet)
 library(htmlwidgets)
+library(htmltools)
 
-app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app <- Dash$new(external_stylesheets = dashBootstrapComponents::dbcThemes$BOOTSTRAP)
 app$title("Vancouver Crime Dashboard")
 
-data <- read_csv('data/processed_df.csv')
+data <- readr::read_csv('data/processed_df.csv')
 
 opt_dropdown_neighbourhood <- unique(data$Neighborhood) %>%
-    map(function(col) list(label = col, value = col))
+    purrr::map(function(col) list(label = col, value = col))
 opt_dropdown_neighbourhood <- opt_dropdown_neighbourhood[-c(20, 24, 25)]
 
 opt_radio_year <- list(list(label = '2017', value = 2017),
@@ -34,9 +36,9 @@ opt_dropdown_time = list(
 )
 
 # Collapse button
-collapse <- htmlDiv(
+collapse <- dashHtmlComponents::htmlDiv(
     list(
-        dbcButton(
+        dashBootstrapComponents::dbcButton(
             "Learn more",
             id = "collapse-button",
             className = "mb-3",
@@ -53,10 +55,10 @@ collapse <- htmlDiv(
 )
 
 # summary card
-card1 <- dbcCard(
+card1 <- dashBootstrapComponents::dbcCard(
     list(
-        htmlH4("Total Number of Crimes", className = "card-title", style = list("marginLeft" = 50)),
-        htmlDiv(id = "summary", style = list("color" = "#E33B18", "fontSize" = 25, "marginLeft" = 140))
+        dashHtmlComponents::htmlH4("Total Number of Crimes", className = "card-title", style = list("marginLeft" = 50)),
+        dashHtmlComponents::htmlDiv(id = "summary", style = list("color" = "#E33B18", "fontSize" = 25, "marginLeft" = 140))
     ),
     style = list("width" = "25rem", "marginLeft" = 20),
     body = TRUE,
@@ -64,29 +66,29 @@ card1 <- dbcCard(
 )
 
 # filters card
-card2 <- dbcCard(
+card2 <- dashBootstrapComponents::dbcCard(
     list(
         # Dropdown for neighbourhood
-        htmlH5("Neighbourhood", className="text-dark"),
-        dccDropdown(id = "neighbourhood_input",
+        dashHtmlComponents::htmlH5("Neighbourhood", className="text-dark"),
+        dash::dccDropdown(id = "neighbourhood_input",
                     options = opt_dropdown_neighbourhood, 
                     value = list('Kitsilano'),
                     className="dropdown",
                     multi = TRUE),
-        htmlBr(),
+        dashHtmlComponents::htmlBr(),
         # Radio button for year
-        htmlH5("Year", className="text-dark"),
-        dccRadioItems(id = "year_radio",
+        dashHtmlComponents::htmlH5("Year", className="text-dark"),
+        dash::dccRadioItems(id = "year_radio",
                       options = opt_radio_year, 
                       value = 2021,
                       persistence=TRUE,
                       persistence_type='session',
                       className="radiobutton",
                       labelStyle = list("display" = "in-block", "marginLeft" = 20)),
-        htmlBr(),
+        dashHtmlComponents::htmlBr(),
         # Dropdown for time
-        htmlH5("Time", className="text-dark"),
-        dccDropdown(id = "time-input",
+        dashHtmlComponents::htmlH5("Time", className="text-dark"),
+        dash::dccDropdown(id = "time-input",
                     options = opt_dropdown_time,
                     value = "Day and Night",
                     className = "dropdown")
@@ -97,13 +99,13 @@ card2 <- dbcCard(
 )
 
 # information card
-card3 <- dbcCard(
+card3 <- dashBootstrapComponents::dbcCard(
     list(
-        htmlH5("Information", className="text-dark"),
-        htmlP(
+        dashHtmlComponents::htmlH5("Information", className="text-dark"),
+        dashHtmlComponents::htmlP(
             list(
                 "Data used in this dashboard is sourced from ",
-                dccLink(
+                dash::dccLink(
                     "Vancouver Police Department",
                     href = "https://geodash.vpd.ca/opendata/",
                     target = "_blank"
@@ -119,8 +121,8 @@ card3 <- dbcCard(
 
 # filter layout
 filter_panel = list(
-    htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
-    dbcCollapse(htmlP("The filter panel below helps you filter the plots. 
+    dashHtmlComponents::htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
+    dashBootstrapComponents::dbcCollapse(dashHtmlComponents::htmlP("The filter panel below helps you filter the plots. 
                       The neighborhood filter can accept multiple options and 
                       updates the bar chart and the line graph. The year filter will 
                       update the bar chart and the map so they show the crimes for 
@@ -130,52 +132,52 @@ filter_panel = list(
                       neighbourhood.",
                       style = list("marginLeft" = 20)),
                 id = "collapse", is_open = FALSE),
-    dbcRow(collapse, style = list("marginLeft" = 120)),
-    htmlBr(),
+    dashBootstrapComponents::dbcRow(collapse, style = list("marginLeft" = 120)),
+    dashHtmlComponents::htmlBr(),
     card1,
-    htmlBr(),
-    htmlH4("Filters", style = list("marginLeft" = 20)),
+    dashHtmlComponents::htmlBr(),
+    dashHtmlComponents::htmlH4("Filters", style = list("marginLeft" = 20)),
     card2,
-    htmlBr(),
+    dashHtmlComponents::htmlBr(),
     card3
 )
 
 # plots layout
 plot_body = list(
-    dbcRow(list(
-        dbcCol(dccGraph("bar_plot")),
-        dbcCol(htmlDiv(list(htmlIframe(id = "map", style = list(width = 500, height = 300)))))
+    dashBootstrapComponents::dbcRow(list(
+        dashBootstrapComponents::dbcCol(dash::dccGraph("bar_plot")),
+        dashBootstrapComponents::dbcCol(dashHtmlComponents::htmlDiv(list(dashHtmlComponents::htmlIframe(id = "map", style = list(width = 500, height = 300)))))
     )
     ),
-    htmlBr(),
-    htmlBr(),
-    htmlBr(),
-    htmlBr(),
-    dbcRow(
-        dbcCol(dccGraph("line_plot"))
+    dashHtmlComponents::htmlBr(),
+    dashHtmlComponents::htmlBr(),
+    dashHtmlComponents::htmlBr(),
+    dashHtmlComponents::htmlBr(),
+    dashBootstrapComponents::dbcRow(
+        dashBootstrapComponents::dbcCol(dash::dccGraph("line_plot"))
     )
 )
 
 # Page layout
-page_layout <- htmlDiv(
+page_layout <- dashHtmlComponents::htmlDiv(
     className="page_layout",
     children=list(
-        dbcRow(htmlBr()),
-        dbcRow(
-            list(dbcCol(filter_panel, className = "panel", width = 3),
-                 dbcCol(plot_body, className = "body"))
+        dashBootstrapComponents::dbcRow(dashHtmlComponents::htmlBr()),
+        dashBootstrapComponents::dbcRow(
+            list(dashBootstrapComponents::dbcCol(filter_panel, className = "panel", width = 3),
+                 dashBootstrapComponents::dbcCol(plot_body, className = "body"))
         )
     )
 )
 
 # Overall layout
-app$layout(htmlDiv(id="main", className="app", children=page_layout))
+app$layout(dashHtmlComponents::htmlDiv(id="main", className="app", children=page_layout))
 
 # functions
 app$callback(
-    output("summary", "children"),
-    list(input("neighbourhood_input", "value"),
-         input("year_radio", "value")),
+    dash::output("summary", "children"),
+    list(dash::input("neighbourhood_input", "value"),
+         dash::input("year_radio", "value")),
     function(neighbourhood, year) {
         data_summary <- data %>%
             filter(Neighborhood == neighbourhood, YEAR == year)
@@ -184,15 +186,15 @@ app$callback(
 )
 
 app$callback(
-    output("bar_plot", "figure"),
-    list(input("neighbourhood_input", "value"),
-         input("year_radio", "value")),
+    dash::output("bar_plot", "figure"),
+    list(dash::input("neighbourhood_input", "value"),
+         dash::input("year_radio", "value")),
     function(neighbourhood, year){
         bar_data <- data %>%
             filter(Neighborhood == neighbourhood, YEAR == year) %>%
-            add_count(Type)
+            dplyr::add_count(Type)
         bar_chart <-  bar_data %>%
-            ggplot(aes(y = reorder(Type, -n), fill = Type)) +
+            ggplot2::ggplot(aes(y = reorder(Type, -n), fill = Type)) +
             geom_bar() + 
             labs(title = "Crimes by Type", x = "Number of Crimes", y = "Type of Crime") +
             theme(
@@ -205,14 +207,14 @@ app$callback(
             ) +
             scale_fill_brewer(palette="YlOrRd")
         
-        ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 500, height = 300)
+        plotly::ggplotly(bar_chart + aes(text = n), tooltip = c("Type", "n"), width = 500, height = 300)
     }
 )
 
 app$callback(
-    output("line_plot", 'figure'),
-    list(input("neighbourhood_input", "value"),
-         input("time-input", "value")),
+    dash::output("line_plot", 'figure'),
+    list(dash::input("neighbourhood_input", "value"),
+         dash::input("time-input", "value")),
     function(neighbourhood, time){
         line_data <- data
         line_data <- line_data %>%
@@ -228,7 +230,7 @@ app$callback(
         }
         
         line_chart <-  line_data %>%
-            ggplot(aes(x = YEAR, color = TIME)) +
+            ggplot2::ggplot(aes(x = YEAR, color = TIME)) +
             geom_line(stat = 'count') +
             labs(title = "Crimes over time", x = "Year", y = "Number of Crimes") +
             theme(
@@ -238,13 +240,13 @@ app$callback(
                 panel.background = element_blank()
             ) +
             scale_color_manual(values = c("red", "orange"))
-        ggplotly(line_chart, tooltip = "count", width = 1200, height = 400)
+        plotly::ggplotly(line_chart, tooltip = "count", width = 1200, height = 400)
     }
 )
 
 app$callback(
-    output('map', 'srcDoc'),
-    list(input('year_radio', 'value')),
+    dash::output('map', 'srcDoc'),
+    list(dash::input('year_radio', 'value')),
     function(yyyy) {
         file = switch(as.character(yyyy),
                       '2021' = "data/map2021.geojson",
@@ -253,44 +255,44 @@ app$callback(
                       '2018' = "data/map2018.geojson",
                       '2017' = "data/map2017.geojson")
         vancity <- geojsonio::geojson_read(file, what = "sp")
-        m1 <- leaflet(vancity) %>%
-            addProviderTiles("MapBox", options = providerTileOptions(
+        m1 <- leaflet::leaflet(vancity) %>%
+            leaflet::addProviderTiles("MapBox", options = leaflet::providerTileOptions(
                 id = "mapbox.light",
                 accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')))
         bins <- c(0, 500, 1000, 1500, 2000, 2500, 3000, 3500, Inf)
-        pal <- colorBin("YlOrRd", domain = vancity$year, bins = bins)
+        pal <- leaflet::colorBin("YlOrRd", domain = vancity$year, bins = bins)
         labels <- sprintf(
             "<strong>%s</strong><br/>%g Crimes",
             vancity$name, vancity$year
         ) %>% lapply(htmltools::HTML)
-        m2 <- m1 %>% addPolygons(
+        m2 <- m1 %>% leaflet::addPolygons(
             fillColor = ~pal(year),
             weight = 2,
             opacity = 1,
             color = "white",
             dashArray = "1",
             fillOpacity = 0.7,
-            highlightOptions = highlightOptions(
+            highlightOptions = leaflet::highlightOptions(
                 weight = 5,
                 color = "#666",
                 dashArray = "",
                 fillOpacity = 0.7,
                 bringToFront = TRUE),
             label = labels,
-            labelOptions = labelOptions(
+            labelOptions = leaflet::labelOptions(
                 style = list("font-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                 direction = "auto"))
-        saveWidget(m2, file="m.html")
+        htmlwidgets::saveWidget(m2, file="m.html")
         htmltools::includeHTML("m.html")
     }
 )
 
 app$callback(
-    output("collapse", "is_open"),
+    dash::output("collapse", "is_open"),
     list(
-        input("collapse-button", "n_clicks"),
-        state("collapse", "is_open")
+        dash::input("collapse-button", "n_clicks"),
+        dash::state("collapse", "is_open")
     ),
     function(n, is_open) {
         if (n > 0) {
