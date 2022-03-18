@@ -7,8 +7,6 @@ library(purrr)
 library(plotly)
 library(ggthemes)
 library(ggplot2)
-library(htmlwidgets)
-library(htmltools)
 library(rgdal)
 
 app <- Dash$new(external_stylesheets = dashBootstrapComponents::dbcThemes$BOOTSTRAP)
@@ -116,7 +114,7 @@ card3 <- dashBootstrapComponents::dbcCard(
     color = "light",
 )
 
-# filter layout
+# filters layout
 filter_panel = list(
     dashHtmlComponents::htmlBr(),
     dashHtmlComponents::htmlH2("Vancouver Crime Dashboard", style = list("marginLeft" = 20)),
@@ -177,7 +175,7 @@ app$callback(
          dash::input("year_radio", "value")),
     function(neighbourhood, year) {
         data_summary <- data %>%
-            dplyr::filter(Neighborhood == neighbourhood, YEAR == year)
+            dplyr::filter(Neighborhood %in% neighbourhood, YEAR == year)
         nrow(data_summary)
     }
 )
@@ -188,7 +186,7 @@ app$callback(
          dash::input("year_radio", "value")),
     function(neighbourhood, year){
         bar_data <- data %>%
-            dplyr::filter(Neighborhood == neighbourhood, YEAR == year) %>%
+            dplyr::filter(Neighborhood %in% neighbourhood, YEAR == year) %>%
             dplyr::add_count(Type)
         bar_chart <-  bar_data %>%
             ggplot2::ggplot(aes(y = reorder(Type, -n), fill = Type)) +
@@ -254,7 +252,7 @@ app$callback(
              dplyr::left_join(df, by = c("id" = "Neighborhood"))
 
         p <- ggplot2::ggplot() +
-        ggplot2::labs(title = "Crimes by Neighborhooud", x = "Longitude", y = "Latitude") +
+        ggplot2::labs(title = "Crimes by Neighbourhood", x = "Longitude", y = "Latitude") +
         ggplot2::geom_polygon(data = geojson2, 
         aes(x = long, y = lat, group = group, fill = Count)) +
         theme(
@@ -283,6 +281,4 @@ app$callback(
 )
 
 app$run_server(host = '0.0.0.0')
-# app$run_server(debug=T)
-
 
