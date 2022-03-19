@@ -1,3 +1,4 @@
 gdal-bin
 libgdal-dev
 libgdal1h
+libproj-dev
