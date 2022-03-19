@@ -9,7 +9,7 @@ options(repos=r)
 # ======================================================================
 
 # packages go here
-install.packages(c('dash', 'tidyverse', 
+helpers.install.packages(c('dash', 'tidyverse', 
                    'maptools', 'rgeos', 'rgdal',  'mapproj', 'broom',
                    'readr', 'here', 'ggthemes', 'remotes', 'dashHtmlComponents',
                    'ggplot2', 'dplyr', 'GGally', 'purrr', 'plotly'))
