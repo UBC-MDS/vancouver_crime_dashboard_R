@@ -7,6 +7,7 @@ library(purrr)
 library(plotly)
 library(ggthemes)
 library(ggplot2)
+library(broom)
 library(rgdal)
 
 app <- Dash$new(external_stylesheets = dashBootstrapComponents::dbcThemes$BOOTSTRAP)
