@@ -9,8 +9,9 @@ options(repos=r)
 # ======================================================================
 
 # packages go here
-helpers.install.packages(c('dash', 'tidyverse', 
-                   'maptools', 'rgeos', 'rgdal',  'mapproj', 'broom',
-                   'readr', 'here', 'ggthemes', 'remotes', 'dashHtmlComponents',
-                   'ggplot2', 'dplyr', 'GGally', 'purrr', 'plotly'))
+install.packages(c('dash', 'tidyverse',
+                   # map-related packages
+                   'maptools', 'rgeos', 'rgdal', 'mapproj', 'broom',
+                   'readr', 'here', 'ggthemes', 'remotes', 'dashCoreComponents', 'dashHtmlComponents', 'dashBootstrapComponents', 
+                   'ggplot2', 'dplyr', 'GGally', 'plotly'))
 remotes::install_github('facultyai/dash-bootstrap-components@r-release')
